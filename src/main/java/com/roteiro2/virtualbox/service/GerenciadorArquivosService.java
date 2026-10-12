@@ -1,4 +1,3 @@
-```java
 package com.roteiro2.virtualbox.service;
 
 import java.io.IOException;
@@ -146,4 +145,3 @@ public class GerenciadorArquivosService {
         );
     }
 }
-```
