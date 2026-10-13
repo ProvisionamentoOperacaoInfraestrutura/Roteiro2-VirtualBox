@@ -65,7 +65,14 @@ sudo usermod -aG docker "${docker_user}"
 echo
 echo "Docker instalado com sucesso."
 echo "Usuário adicionado ao grupo docker: ${docker_user}"
-echo "Faça logout/login ou execute 'newgrp docker' antes de usar Docker sem sudo."
 echo
 sudo docker version --format '{{.Server.Version}}'
 sudo docker compose version
+
+if [[ "${EUID}" -ne 0 && -t 0 && -t 1 ]]; then
+  echo
+  echo "Abrindo uma nova sessão com o grupo docker..."
+  exec newgrp docker
+else
+  echo "Faça logout/login ou execute 'newgrp docker' antes de usar Docker sem sudo."
+fi
