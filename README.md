@@ -95,6 +95,13 @@ done
 
 ## Testes com Locust
 
+Se a VM apresentar `uvx: command not found`, instale o Locust uma vez:
+
+```bash
+chmod +x install-locust.sh
+./install-locust.sh
+```
+
 Os três testes podem ser executados simultaneamente. Em cada interface,
 defina a quantidade de usuários e a taxa de inicialização.
 
