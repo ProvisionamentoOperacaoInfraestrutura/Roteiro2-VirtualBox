@@ -1,3 +1,16 @@
+## Instalar Docker na VM
+
+Se a VM apresentar `docker: command not found`, execute:
+
+```bash
+chmod +x install-docker.sh
+./install-docker.sh
+newgrp docker
+```
+
+O script instala o Docker Engine e o Docker Compose Plugin para Ubuntu ou
+Debian.
+
 ## Subir as aplicações
 
 Na raiz do projeto, execute:
