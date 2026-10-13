@@ -1,3 +1,30 @@
+## Subir as aplicações
+
+Na raiz do projeto, execute:
+
+```bash
+chmod +x start-all.sh
+./start-all.sh
+```
+
+Esse comando sobe as três aplicações, seus Prometheus e seus Grafanas.
+
+Portas principais:
+
+| Aplicação | API | Prometheus | Grafana |
+|---|---:|---:|---:|
+| CPU bound | `8081` | `9091` | `3004` |
+| IO bound | `8082` | `9092` | `3002` |
+| Memory bound | `8083` | `9093` | `3003` |
+
+Para derrubar as três aplicações sem remover os volumes:
+
+```bash
+for app in cpu_bound io_bound memory_bound; do
+  docker compose -f "$app/docker-compose.yml" down
+done
+```
+
 ## Testes com Locust
 
 Execute apenas um comando por vez. Depois, acesse `http://localhost:8089` para
