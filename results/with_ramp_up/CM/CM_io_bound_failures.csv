@@ -1,0 +1,2 @@
+Method,Name,Error,Occurrences,First Seen,Last Seen
+GET,/v1/io_bound/arquivo,HTTPError('404 Client Error:  for url: /v1/io_bound/arquivo'),151668,2026-10-13T23:32:10Z,2026-10-13T23:34:16Z

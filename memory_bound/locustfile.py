@@ -6,4 +6,4 @@ class ApiUser(HttpUser):
 
     @task
     def consultar_estatisticas(self):
-        self.client.get("/v1/main/estatisticas?enesimo=100", name="/v1/main/estatisticas")
+        self.client.get("/v1/main/estatisticas?enesimo=100000", name="/v1/main/estatisticas")

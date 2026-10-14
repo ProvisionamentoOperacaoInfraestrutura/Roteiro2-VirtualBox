@@ -6,4 +6,4 @@ class ApiUser(HttpUser):
 
     @task
     def consultar_primos(self):
-        self.client.get("/v1/cpu_bound/primos?enesimo=100", name="/v1/cpu_bound/primos")
+        self.client.get("/v1/cpu_bound/primos?enesimo=1000000", name="/v1/cpu_bound/primos")
