@@ -40,7 +40,7 @@ com todos os primos encontrados.
 
 Abra o Locust correspondente, configure usuários e taxa de subida e inicie o teste.
 No Grafana correspondente, abra `Locust x Aplicação` e use o mesmo intervalo de tempo
-do teste. O Prometheus coleta a cada 2 segundos e o dashboard atualiza a cada 5 segundos.
+do teste. O Prometheus coleta a cada 10 segundos (com timeout de 5 segundos) e o dashboard atualiza a cada 5 segundos.
 
 ## Como validar a correlação
 
