@@ -1,4 +1,8 @@
 from locust import HttpUser, between, task
+from observability.locust_metrics import setup_prometheus_metrics
+
+
+setup_prometheus_metrics("io_bound")
 
 
 class ApiUser(HttpUser):

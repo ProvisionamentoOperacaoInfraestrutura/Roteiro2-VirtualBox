@@ -17,6 +17,32 @@ services:
     networks:
       - aw-network
 
+  locust:
+    image: virtualbox-locust:2.46.0
+    build:
+      context: ../observability
+      dockerfile: locust.Dockerfile
+    command:
+      - -f
+      - /mnt/locust/locustfile.py
+      - --host
+      - http://app:8084
+      - --web-host
+      - 0.0.0.0
+      - --web-port
+      - "8089"
+    environment:
+      PYTHONPATH: /mnt/locust
+    volumes:
+      - ./locustfile.py:/mnt/locust/locustfile.py:ro
+      - ../observability:/mnt/locust/observability:ro
+    depends_on:
+      - app
+    networks:
+      - aw-network
+    ports:
+      - "8091:8089"
+
   prometheus:
     image: prom/prometheus:latest
     volumes:
@@ -24,6 +50,7 @@ services:
       - prometheus-data:/prometheus
     depends_on:
       - app
+      - locust
     networks:
       - aw-network
     ports:
@@ -34,6 +61,7 @@ services:
       - grafana-data:/var/lib/grafana
       - ./config/grafana/datasources:/etc/grafana/provisioning/datasources:ro
       - ./config/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ../observability/grafana:/etc/grafana/provisioning/locust-dashboards:ro
     depends_on:
       - prometheus
     networks:

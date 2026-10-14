@@ -1,0 +1,9 @@
+# Build output and local tooling
+/.gradle/
+/build/
+/.idea/
+HELP.md
+
+# Python bytecode and cache directories
+__pycache__/
+*.py[cod]

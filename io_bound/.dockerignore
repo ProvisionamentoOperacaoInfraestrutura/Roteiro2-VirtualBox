@@ -3,3 +3,9 @@
 .idea
 build
 dados
+config
+locustfile.py
+results
+__pycache__
+*.pyc
+docker-compose.yml

@@ -8,7 +8,7 @@ for app in cpu_bound io_bound memory_bound; do
   echo "Subindo ${app}..."
   docker compose \
     --file "${SCRIPT_DIR}/${app}/docker-compose.yml" \
-    up --detach --build
+    up --detach --build --force-recreate
 done
 
 echo "As três aplicações foram iniciadas."

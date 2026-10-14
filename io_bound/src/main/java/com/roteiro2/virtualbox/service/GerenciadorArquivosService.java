@@ -1,5 +1,10 @@
 package com.roteiro2.virtualbox.service;
 
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.DistributionSummary;
+import io.micrometer.core.instrument.LongTaskTimer;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -24,6 +29,39 @@ public class GerenciadorArquivosService {
 
     private static final int ALINHAMENTO = 4096;
     private static final int TAMANHO_BLOCO = 1024 * 1024;
+
+    private final MeterRegistry meterRegistry;
+    private final Timer duration;
+    private final LongTaskTimer activeOperations;
+    private final DistributionSummary inputSize;
+    private final Counter outputUnits;
+    private final Counter failures;
+
+    public GerenciadorArquivosService(MeterRegistry meterRegistry) {
+        this.meterRegistry = meterRegistry;
+        this.duration = Timer.builder("workload.operation.duration")
+                .description("Tempo da operação principal da aplicação")
+                .tag("type", "io")
+                .publishPercentileHistogram()
+                .register(meterRegistry);
+        this.activeOperations = LongTaskTimer.builder("workload.operation.active")
+                .description("Operações principais atualmente em execução")
+                .tag("type", "io")
+                .register(meterRegistry);
+        this.inputSize = DistributionSummary.builder("workload.input.size")
+                .description("Bytes previstos para leitura direta")
+                .tag("type", "io")
+                .register(meterRegistry);
+        this.outputUnits = Counter.builder("workload.output.units")
+                .description("Bytes lidos pela operação principal")
+                .tag("type", "io")
+                .tag("unit", "bytes")
+                .register(meterRegistry);
+        this.failures = Counter.builder("workload.operation.failures")
+                .description("Falhas da operação principal")
+                .tag("type", "io")
+                .register(meterRegistry);
+    }
 
     private interface LibC extends Library {
         LibC INSTANCE = Native.load("c", LibC.class);
@@ -58,6 +96,7 @@ public class GerenciadorArquivosService {
         }
 
         long tamanho = Files.size(ARQUIVO);
+        inputSize.record(tamanho);
 
         if (tamanho % ALINHAMENTO != 0) {
             throw new IOException(
@@ -66,6 +105,8 @@ public class GerenciadorArquivosService {
             );
         }
 
+        Timer.Sample durationSample = Timer.start(meterRegistry);
+        LongTaskTimer.Sample activeSample = activeOperations.start();
         long inicio = System.nanoTime();
         long bytesLidos = 0;
 
@@ -128,14 +169,21 @@ public class GerenciadorArquivosService {
 
                 bytesLidos += quantidadeLida;
             }
+        } catch (IOException | RuntimeException | Error error) {
+            failures.increment();
+            throw error;
         } finally {
             if (buffer != null) {
                 libc.free(buffer);
             }
             libc.close(fd);
+            activeSample.stop();
+            durationSample.stop(duration);
         }
 
         long tempoMs = (System.nanoTime() - inicio) / 1_000_000;
+
+        outputUnits.increment(bytesLidos);
 
         return Map.of(
                 "arquivo", ARQUIVO.toString(),

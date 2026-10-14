@@ -6,6 +6,12 @@ resilience4j:
         slidingWindowSize: 8
 
 management:
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+      slo:
+        http.server.requests: 10ms,50ms,100ms,250ms,500ms,1s,2s,5s,10s,30s
   endpoints:
     enabled-by-default: false
     web:

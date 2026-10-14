@@ -3,16 +3,8 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-uvx_bin="$(command -v uvx 2>/dev/null || true)"
-uvx_bin="${uvx_bin:-${HOME}/.local/bin/uvx}"
 
-if [[ ! -x "${uvx_bin}" ]]; then
-  echo "uvx não encontrado. Execute ./install-locust.sh primeiro."
-  exit 1
-fi
+docker compose --file "${SCRIPT_DIR}/io_bound/docker-compose.yml" \
+  up --detach --force-recreate locust
 
-exec "${uvx_bin}" --from locust locust \
-  -f "${SCRIPT_DIR}/io_bound/locustfile.py" \
-  --host http://localhost:8082 \
-  --web-host 0.0.0.0 \
-  --web-port 8090
+echo "Locust I/O disponível em http://localhost:8090"
