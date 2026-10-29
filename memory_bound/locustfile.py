@@ -1,3 +1,5 @@
+import random
+
 from locust import HttpUser, between, task
 from observability.locust_metrics import setup_prometheus_metrics
 
@@ -10,4 +12,12 @@ class ApiUser(HttpUser):
 
     @task
     def consultar_estatisticas(self):
-        self.client.get("/v1/main/estatisticas?enesimo=100", name="/v1/main/estatisticas")
+        enesimo = random.randint(100_000, 2_000_000)
+
+        with self.client.get(
+            f"/v1/main/estatisticas?enesimo={enesimo}",
+            name="/v1/main/estatisticas",
+            catch_response=True,
+        ) as response:
+            if response.status_code != 200:
+                response.failure(f"Erro HTTP {response.status_code}")
