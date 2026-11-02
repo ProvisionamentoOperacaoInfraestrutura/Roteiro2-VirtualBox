@@ -71,37 +71,37 @@ services:
       - "3004:3000"
 
 
-logger:
-  image: docker:cli
-  restart: unless-stopped
-  volumes:
-    - /var/run/docker.sock:/var/run/docker.sock:ro
-    - /mnt/dados:/logs
-  depends_on:
-    - app
-    - locust
-    - prometheus
-    - grafana
-  networks:
-    - aw-network
-  command:
-    - sh
-    - -c
-    - |
-      PROJECT=$$(docker inspect --format '{{index .Config.Labels "com.docker.compose.project"}}' $$(hostname))
-      for s in app locust prometheus grafana; do
-        (
-          SINCE=0
-          while true; do
-            ID=$$(docker ps -q --filter "label=com.docker.compose.project=$$PROJECT" --filter "label=com.docker.compose.service=$$s")
-            if [ -n "$$ID" ]; then
-              docker logs -f --timestamps --since "$$SINCE" "$$ID" 2>&1 | while IFS= read -r line; do
-                echo "[$$s] $$line" >> /logs/cpu.log
-              done
-              SINCE=$$(date +%s)
-            fi
-            sleep 2
-          done
-        ) &
-      done
-      wait
+  logger:
+    image: docker:cli
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /mnt/dados:/logs
+    depends_on:
+      - app
+      - locust
+      - prometheus
+      - grafana
+    networks:
+      - aw-network
+    command:
+      - sh
+      - -c
+      - |
+        PROJECT=$$(docker inspect --format '{{index .Config.Labels "com.docker.compose.project"}}' $$(hostname))
+        for s in app locust prometheus grafana; do
+          (
+            SINCE=0
+            while true; do
+              ID=$$(docker ps -q --filter "label=com.docker.compose.project=$$PROJECT" --filter "label=com.docker.compose.service=$$s")
+              if [ -n "$$ID" ]; then
+                docker logs -f --timestamps --since "$$SINCE" "$$ID" 2>&1 | while IFS= read -r line; do
+                  echo "[$$s] $$line" >> /logs/cpu.log
+                done
+                SINCE=$$(date +%s)
+              fi
+              sleep 2
+            done
+          ) &
+        done
+        wait
