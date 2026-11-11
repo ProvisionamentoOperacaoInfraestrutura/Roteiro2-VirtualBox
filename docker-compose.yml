@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  cpu_bound:
+    image: miguelolivrd/cpu_bound:v1
+    container_name: cpu_bound_app
+    restart: always
+    ports:
+      - "8081:8084" 
+
+  io_bound:
+    image: miguelolivrd/io_bound:v1
+    container_name: io_bound_app
+    restart: always
+    ports:
+      - "8082:8084" 
+
+  memory_bound:
+    image: miguelolivrd/memory_bound:v1
+    container_name: memory_bound_app
+    restart: always
+    ports:
+      - "8083:8084" 
